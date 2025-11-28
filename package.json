@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "bun build index.ts --outfile ./public/index.js --target browser"
+    "build": "bun build index.ts --outfile ./public/index.js --target browser --sourcemap=inline",
+    "watch-build": "bun build index.ts --outfile ./public/index.js --target browser --sourcemap=inline --watch"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "mathjs": "^15.1.0"
   }
 }
