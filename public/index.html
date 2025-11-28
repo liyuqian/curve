@@ -7,11 +7,19 @@
         height: 100%;
         border: 1px solid #000;
       }
+      #signed-distance {
+        width: 100%;
+      }
     </style>
   </head>
   <body>
     <h1>Curve by sample points</h1>
     <canvas id="canvas"></canvas>
+    <div>
+      <label for="signed-distance">Contour signed distance</label>
+      <output for="signed-distance" id="signed-distance-output">0</output>
+      <input type="range" id="signed-distance" min="-100" max="100" value="0" step="1">
+    </div>
     <script type="module" src="index.js"></script>
   </body>
 </html>

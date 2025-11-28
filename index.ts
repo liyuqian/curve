@@ -11,11 +11,25 @@ function main() {
   const ctx = canvas.getContext('2d')!;
   const points: Vec2[] = [];
 
+  let polycurve = new Polycurve(points);
+  let signedDistance: number = 0;
+  const inputElement =
+      document.getElementById('signed-distance') as HTMLInputElement;
+  const outputElement =
+      document.getElementById('signed-distance-output') as HTMLOutputElement;
+  inputElement.addEventListener('input', (event: Event) => {
+    signedDistance = Number((event.target as HTMLInputElement).value);
+    outputElement.textContent = signedDistance.toString();
+  });
+  inputElement.addEventListener('change', (event: Event) => {
+    drawPolycurve(ctx, polycurve, signedDistance);
+  });
+
   scaleCanvas(canvas, ctx);
   canvas.addEventListener('click', (event: PointerEvent) => {
     points.push([event.offsetX, event.offsetY]);
-    const polycurve = new Polycurve(points);
-    drawPolycurve(ctx, polycurve);
+    polycurve = new Polycurve(points);
+    drawPolycurve(ctx, polycurve, signedDistance);
   });
 }
 
@@ -98,7 +112,8 @@ class Polycurve {
     const dLerped = evaluate(
         'dp * (1 - r) + dq * r',
         {dp: distance(p, f), dq: distance(q, f), r: reminder});
-    return evaluate('f + l * d', {f: f, l: left, d: dLerped});
+    const d = dLerped + leftOffset * Math.sign(focal[2]);
+    return evaluate('f + l * d', {f: f, l: left, d: d});
   }
 
   public focal(i: number): Vec3 {
@@ -160,7 +175,9 @@ function drawLine(
   ctx.stroke();
 }
 
-function drawPolycurve(ctx: CanvasRenderingContext2D, polycurve: Polycurve) {
+function drawPolycurve(
+    ctx: CanvasRenderingContext2D, polycurve: Polycurve,
+    signedDistance: number) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   for (let i = 0; i < polycurve.n; i++) {
     drawPoint(ctx, polycurve.point(i));
@@ -177,10 +194,15 @@ function drawPolycurve(ctx: CanvasRenderingContext2D, polycurve: Polycurve) {
   }
   const kSampleCount = 1000 as const;
   let prev = polycurve.generatePoint(0);
+  let contourPrev = polycurve.generatePoint(0, signedDistance);
   for (let i = 1; i < kSampleCount; i++) {
-    const point = polycurve.generatePoint(i / kSampleCount * (polycurve.n - 1));
+    const generalI = i / kSampleCount * (polycurve.n - 1);
+    const point = polycurve.generatePoint(generalI);
+    const contourPoint = polycurve.generatePoint(generalI, signedDistance);
     drawLine(ctx, prev, point);
+    drawLine(ctx, contourPrev, contourPoint, 'blue');
     prev = point;
+    contourPrev = contourPoint;
   }
 }
 
