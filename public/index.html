@@ -4,7 +4,7 @@
     <style>
       #canvas {
         width: 100%;
-        height: 100%;
+        height: 300px;
         border: 1px solid #000;
       }
       #signed-distance {
@@ -13,7 +13,7 @@
     </style>
   </head>
   <body>
-    <h1>Curve by sample points</h1>
+    <h1>Curve by sample points and signed distance</h1>
     <canvas id="canvas"></canvas>
     <div>
       <label for="signed-distance">Contour signed distance</label>
@@ -21,5 +21,17 @@
       <input type="range" id="signed-distance" min="-100" max="100" value="0" step="1">
     </div>
     <script type="module" src="index.js"></script>
+
+    <div id="markdown-content"></div>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']], tags: 'ams'}};
+      fetch('index.md').then(response => response.text()).then(text => {
+        document.getElementById('markdown-content').innerHTML =
+            marked.parse(text);
+        MathJax.typesetPromise();
+      });
+    </script>
   </body>
 </html>
