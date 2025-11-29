@@ -11,7 +11,7 @@ function main() {
   const ctx = canvas.getContext('2d')!;
   const points: Vec2[] = [];
 
-  let polycurve = new Polycurve(points);
+  let curve = new Curve(points);
   let signedDistance: number = 0;
   const inputElement =
       document.getElementById('signed-distance') as HTMLInputElement;
@@ -22,18 +22,18 @@ function main() {
     outputElement.textContent = signedDistance.toString();
   });
   inputElement.addEventListener('change', (event: Event) => {
-    drawPolycurve(ctx, polycurve, signedDistance);
+    drawCurve(ctx, curve, signedDistance);
   });
 
   scaleCanvas(canvas, ctx);
   canvas.addEventListener('click', (event: PointerEvent) => {
     points.push([event.offsetX, event.offsetY]);
-    polycurve = new Polycurve(points);
-    drawPolycurve(ctx, polycurve, signedDistance);
+    curve = new Curve(points);
+    drawCurve(ctx, curve, signedDistance);
   });
 }
 
-class Polycurve {
+class Curve {
   public static readonly kEps = 1e-8;
   public static readonly kOrderSupported = 3;
 
@@ -53,7 +53,7 @@ class Polycurve {
     for (let i = 1; i < rawPoints.length; i++) {
       const delta: Vec2 = subtract(rawPoints[i], pg0.at(-1)!);
       const deltaNorm: number = norm(delta) as number;
-      if (deltaNorm > Polycurve.kEps) {
+      if (deltaNorm > Curve.kEps) {
         pg0.push(rawPoints[i]);
         pg1.push(dotDivide(delta, deltaNorm));
       }
@@ -102,7 +102,7 @@ class Polycurve {
     const lerped: Vec2 =
         evaluate('p * (1 - r) + q * r', {p: p, q: q, r: reminder});
 
-    if (Math.abs(focal[2]) <= Polycurve.kEps) {
+    if (Math.abs(focal[2]) <= Curve.kEps) {
       return evaluate(
           'p + l * d', {p: p, l: this.left(i), d: leftOffset});
     }
@@ -175,30 +175,30 @@ function drawLine(
   ctx.stroke();
 }
 
-function drawPolycurve(
-    ctx: CanvasRenderingContext2D, polycurve: Polycurve,
+function drawCurve(
+    ctx: CanvasRenderingContext2D, curve: Curve,
     signedDistance: number) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  for (let i = 0; i < polycurve.n; i++) {
-    drawPoint(ctx, polycurve.point(i));
+  for (let i = 0; i < curve.n; i++) {
+    drawPoint(ctx, curve.point(i));
   }
-  for (let i = 0; i < polycurve.n - 1; i++) {
+  for (let i = 0; i < curve.n - 1; i++) {
     if (kDrawSegments) {
-      drawLine(ctx, polycurve.point(i), polycurve.point(i + 1));
+      drawLine(ctx, curve.point(i), curve.point(i + 1));
     }
     if (kDrawFocals) {
-      drawPoint(ctx, fromHomo(polycurve.focal(i)), 'red');
-      drawLine(ctx, polycurve.point(i), fromHomo(polycurve.focal(i)), 'red');
-      drawLine(ctx, polycurve.point(i + 1), fromHomo(polycurve.focal(i)), 'red');
+      drawPoint(ctx, fromHomo(curve.focal(i)), 'red');
+      drawLine(ctx, curve.point(i), fromHomo(curve.focal(i)), 'red');
+      drawLine(ctx, curve.point(i + 1), fromHomo(curve.focal(i)), 'red');
     }
   }
   const kSampleCount = 1000 as const;
-  let prev = polycurve.generatePoint(0);
-  let contourPrev = polycurve.generatePoint(0, signedDistance);
+  let prev = curve.generatePoint(0);
+  let contourPrev = curve.generatePoint(0, signedDistance);
   for (let i = 1; i < kSampleCount; i++) {
-    const generalI = i / kSampleCount * (polycurve.n - 1);
-    const point = polycurve.generatePoint(generalI);
-    const contourPoint = polycurve.generatePoint(generalI, signedDistance);
+    const generalI = i / kSampleCount * (curve.n - 1);
+    const point = curve.generatePoint(generalI);
+    const contourPoint = curve.generatePoint(generalI, signedDistance);
     drawLine(ctx, prev, point);
     drawLine(ctx, contourPrev, contourPoint, 'blue');
     prev = point;
