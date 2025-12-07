@@ -38,7 +38,7 @@ parallel accelerators (e.g., GPUs)
 ## Algorithm
 
 The curve described above is generated using the following algorithm. See also
-`class Cruve` in [index.ts][1] as an example 100-line implementation.
+"`class Curve`" in [index.ts][1] as an example 100-line implementation.
 
 Given $n$ points $p_i (0 \leq i < n)$ where no 2 consecutive points are
 identical, we generate $n-1$ focal points, 1 for each segment $p_i p_{i + 1}$.
