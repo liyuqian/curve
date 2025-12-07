@@ -6,77 +6,6 @@ type Vec3 = [number, number, number];
 const kDrawFocals = false as const;
 const kDrawSegments = false as const;
 
-function encodePointsToUrl(points: Vec2[]): void {
-  const url = new URL(window.location.href);
-  if (points.length === 0) {
-    url.searchParams.delete('points');
-  } else {
-    url.searchParams.set('points', JSON.stringify(points));
-  }
-  window.history.replaceState({}, '', url);
-}
-
-function decodePointsFromUrl(): Vec2[] {
-  const url = new URL(window.location.href);
-  const encoded = url.searchParams.get('points');
-  if (!encoded) return [];
-  try {
-    return JSON.parse(encoded) as Vec2[];
-  } catch {
-    return [];
-  }
-}
-
-function main() {
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-  const ctx = canvas.getContext('2d')!;
-
-  // Load points from URL on initialization
-  const points: Vec2[] = decodePointsFromUrl();
-
-  let curve = new Curve(points);
-  let signedDistance: number = 0;
-  const inputElement =
-      document.getElementById('signed-distance') as HTMLInputElement;
-  const outputElement =
-      document.getElementById('signed-distance-output') as HTMLOutputElement;
-
-  // Load signed distance from URL if present
-  const url = new URL(window.location.href);
-  const urlSignedDistance = url.searchParams.get('signedDistance');
-  if (urlSignedDistance !== null) {
-    signedDistance = Number(urlSignedDistance);
-    inputElement.value = signedDistance.toString();
-    outputElement.textContent = signedDistance.toString();
-  }
-
-  inputElement.addEventListener('input', (event: Event) => {
-    signedDistance = Number((event.target as HTMLInputElement).value);
-    outputElement.textContent = signedDistance.toString();
-    // Update URL with signed distance
-    const url = new URL(window.location.href);
-    url.searchParams.set('signedDistance', signedDistance.toString());
-    window.history.replaceState({}, '', url);
-  });
-  inputElement.addEventListener('change', (event: Event) => {
-    drawCurve(ctx, curve, signedDistance);
-  });
-
-  scaleCanvas(canvas, ctx);
-
-  // Draw initial curve if points were loaded from URL
-  if (points.length > 0) {
-    drawCurve(ctx, curve, signedDistance);
-  }
-
-  canvas.addEventListener('click', (event: PointerEvent) => {
-    points.push([event.offsetX, event.offsetY]);
-    curve = new Curve(points);
-    drawCurve(ctx, curve, signedDistance);
-    encodePointsToUrl(points);
-  });
-}
-
 class Curve {
   public static readonly kEps = 1e-8;
 
@@ -170,6 +99,77 @@ class Curve {
     const tangent = this.pg(1, i);
     return [-tangent[1], tangent[0]];
   }
+}
+
+function encodePointsToUrl(points: Vec2[]): void {
+  const url = new URL(window.location.href);
+  if (points.length === 0) {
+    url.searchParams.delete('points');
+  } else {
+    url.searchParams.set('points', JSON.stringify(points));
+  }
+  window.history.replaceState({}, '', url);
+}
+
+function decodePointsFromUrl(): Vec2[] {
+  const url = new URL(window.location.href);
+  const encoded = url.searchParams.get('points');
+  if (!encoded) return [];
+  try {
+    return JSON.parse(encoded) as Vec2[];
+  } catch {
+    return [];
+  }
+}
+
+function main() {
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+
+  // Load points from URL on initialization
+  const points: Vec2[] = decodePointsFromUrl();
+
+  let curve = new Curve(points);
+  let signedDistance: number = 0;
+  const inputElement =
+      document.getElementById('signed-distance') as HTMLInputElement;
+  const outputElement =
+      document.getElementById('signed-distance-output') as HTMLOutputElement;
+
+  // Load signed distance from URL if present
+  const url = new URL(window.location.href);
+  const urlSignedDistance = url.searchParams.get('signedDistance');
+  if (urlSignedDistance !== null) {
+    signedDistance = Number(urlSignedDistance);
+    inputElement.value = signedDistance.toString();
+    outputElement.textContent = signedDistance.toString();
+  }
+
+  inputElement.addEventListener('input', (event: Event) => {
+    signedDistance = Number((event.target as HTMLInputElement).value);
+    outputElement.textContent = signedDistance.toString();
+    // Update URL with signed distance
+    const url = new URL(window.location.href);
+    url.searchParams.set('signedDistance', signedDistance.toString());
+    window.history.replaceState({}, '', url);
+  });
+  inputElement.addEventListener('change', (event: Event) => {
+    drawCurve(ctx, curve, signedDistance);
+  });
+
+  scaleCanvas(canvas, ctx);
+
+  // Draw initial curve if points were loaded from URL
+  if (points.length > 0) {
+    drawCurve(ctx, curve, signedDistance);
+  }
+
+  canvas.addEventListener('click', (event: PointerEvent) => {
+    points.push([event.offsetX, event.offsetY]);
+    curve = new Curve(points);
+    drawCurve(ctx, curve, signedDistance);
+    encodePointsToUrl(points);
+  });
 }
 
 function clamp(x: number, min: number, max: number): number {
