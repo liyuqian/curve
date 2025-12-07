@@ -35,7 +35,7 @@ The following conjuectures should be true but I haven't proved them yet.
 Therefore, such curves, and the shapes defined by them, are well-suited for
 parallel accelerators (e.g., GPUs)
 
-# Algorithm
+## Algorithm
 
 The curve described above is generated using the following algorithm. See also
 `class Cruve` in [index.ts][1] as an example 100-line implementation.
