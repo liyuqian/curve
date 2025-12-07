@@ -35,7 +35,6 @@ function main() {
 
 class Curve {
   public static readonly kEps = 1e-8;
-  public static readonly kOrderSupported = 3;
 
   // From order to gradient. 0-th order is the point itself.
   private point_gradients: Map<number, Vec2[]> = new Map();
