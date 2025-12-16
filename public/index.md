@@ -17,8 +17,8 @@ following properties.
 - Any 2D shape with C2-continuous boundary can be represented by a set of such
   curves and distance ranges $d_{min} \leq d \leq d_{max}$.
 
-[triangle]: http://localhost:5002/?points=[[100,100],[150,187],[200,100],[100,100],[150,187],[200,100]]
-[square]: http://localhost:5002/?points=[[100,100],[200,100],[200,200],[100,200],[100,100],[200,100],[200,200],[100,200]]
+[triangle]: ?points=[[100,100],[150,187],[200,100],[100,100],[150,187],[200,100]]
+[square]: ?points=[[100,100],[200,100],[200,200],[100,200],[100,100],[200,100],[200,200],[100,200]]
 
 ## Conjectures
 
@@ -39,6 +39,7 @@ parallel accelerators (e.g., GPUs)
 
 The curve described above is generated using the following algorithm. See also
 "`class Curve`" in [index.ts][1] as an example 100-line implementation.
+(All docs and code sources here are in https://github.com/liyuqian/curve.)
 
 Given $n$ points $p_i (0 \leq i < n)$ where no 2 consecutive points are
 identical, we generate $n-1$ focal points, 1 for each segment $p_i p_{i + 1}$.
